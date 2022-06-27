@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+    <link href="main.css" rel="stylesheet"> 
+    <title>singapore population choropleth</title>
+    </head>
+<body>
+    <div id="title">
+        <h1> Singapore Population Distribution </h1>
+            <p>To visualise which subsdistricts have the most population in SG<br> Hover over the subdistricts to see more details.</p>
+    </div>
+    <svg></svg>
+  
+    <div class ="tooltip"></div>
+  
+    <!-- d3 script-->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+
+    <script>
+        let width = 1000, height = 600;
+        let svg = d3.select("svg")
+            .attr("viewBox", "0 0 " + width + " " + height)
+    
+    // Load external data
+    Promise.all([
+        d3.json("https://chi-loong.github.io/CSC3007/assignments/sgmap.json"), 
+        d3.csv("https://chi-loong.github.io/CSC3007/assignments/population2021.csv")]).then(data => {
+            let sgmap = data[0]
+            let population2021 = data[1]
+
+        console.log(sgmap);
+        console.log(population2021);
+
+    // Map and projection
+    var projection = d3.geoMercator()
+        .center([103.851959, 1.290270])
+        .fitExtent([[20, 20], [980, 580]], sgmap);
+    
+    let geopath = d3.geoPath().projection(projection);
+
+        //binding population to values
+        for(let i=0; i<sgmap.features.length; i++){
+            if(sgmap.features[i].Population == undefined )  {
+                sgmap.features[i].Population = "-";
+            }      
+     }
+
+      //colour scheme
+      var legendLabels = ["<2500 ", "2500 - 7500", "7501-12000", "12001-15000", "15001-20000", "20001 and more"]
+      var colorScale = d3.scaleThreshold()
+        .domain([1000, 5000, 10000, 15000, 25000, 30000])
+        .range(d3.schemePurples[8]);
+
+
+    //population of selected zone
+        selectedPopZone = sgmap.features.map((x) =>
+          Object.assign(x,
+             population2021.find(
+              (y) => y.Subzone.toUpperCase() == x.properties.Name.toUpperCase()
+            )
+          )
+        );
+        console.log(selectedPopZone);
+   
+    //draw the map
+    svg.append("g")
+        .attr("id","districts")
+        .selectAll("path")
+        .data(selectedPopZone)
+        .enter()
+        .append("path")
+        .attr("d",geopath)
+        .attr("fill", function (d) {
+            return colorScale(d.Population);
+        })
+
+    //mouseover
+        .on("mouseover", (event, d) => {
+            if (d.Population >0){
+                d3.select(".tooltip")
+                .text(d.properties.Name + " POPULATION: " + d.Population)
+                .style("left", (event.pageX) + "px")
+                .style("top", (event.pageY) + "px")
+                }
+            else {
+                d3.select(".tooltip")
+                    .text(d.properties.Name +": "+ "NO DATA")
+                    .style("left", (event.pageX+25) + "px")
+                    .style("top", (event.pageY+25) + "px") 
+                    }
+                })
+            .attr("stroke","#000000")
+            .attr("stroke-width", "1")
+           
+    //mouseout
+        .on("mouseout", (event,d)=> {
+            d3.select(".tooltip")
+            .text("");
+            d3.select(svg.selectAll("path")
+            .attr("opacity", 1));
+            d3.select(event.currentTarget) })
+
+    //legend
+        var legendSize = 15;                                
+        var legendSpacing = 3; 
+                
+                var legend = svg.selectAll('.legend')
+                        .data(colorScale.domain())
+                        .enter()
+                        .append('g')
+                        .attr('class', 'legend')
+                        .attr('transform', function(d, i) {  
+                            var height = (legendSize + legendSpacing) + 10;  
+                            var offset =  height * colorScale.domain().length / 2;  
+                            var x = (-2 * legendSize) + 900;  
+                            var y = (i * height - offset) + 450;  
+                            return 'translate(' + x + ',' + y + ')'; 
+                            });
+
+                        legend.append('rect') 
+                        .attr('width', legendSize) 
+                        .attr('height', legendSize)
+                        .style('fill', colorScale) 
+                        .style('stroke', '#181818');
+                        
+                        legend.append('text')  
+                        .attr('x', legendSize + legendSpacing) 
+                        .attr('y', legendSize - legendSpacing) 
+                        .text(function(d, i) { return legendLabels[i]; });  
+                        
+                                          
+            });
+    
+    </script>
+</body>
+</html>

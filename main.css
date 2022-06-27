@@ -1,0 +1,42 @@
+h1 {
+    font-family: "arial";
+    font-weight: 800;
+    font-size: 40px;
+    text-align: center;
+    color: rgb(22, 22, 43);
+}
+
+p {
+    font-family: "arial";
+    font-weight:300;
+    font-size:18px;
+    text-align: center;
+    margin: auto;
+}
+
+.tooltip {
+    font-family: "arial";
+    font-weight:700;
+    color: rgb(22, 22, 43);
+    position:absolute;
+    border-radius: 10px;
+    background-color: rgba(255,255,255, 0.9);
+    width: 240px;
+    height: auto;
+    text-align:center;
+    margin-top:25px;
+    z-index: +2;
+}
+
+path:hover {
+    stroke:#f7f7f7;
+    opacity: 0.75;
+  }
+
+.legend {  
+    font-family: "arial";
+    position: absolute;
+    text-align: center;
+    font-size: 13px;   
+    margin:auto;
+}
