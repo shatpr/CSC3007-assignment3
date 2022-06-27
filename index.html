@@ -11,7 +11,6 @@
             <p>To visualise which subsdistricts have the most population in SG<br> Hover over the subdistricts to see more details.</p>
     </div>
     <svg></svg>
-  
     <div class ="tooltip"></div>
   
     <!-- d3 script-->
@@ -22,7 +21,7 @@
     <script>
         let width = 1000, height = 600;
         let svg = d3.select("svg")
-            .attr("viewBox", "0 0 " + width + " " + height)
+            .attr("viewBox", "0 0 " + width + " " + height);
     
     // Load external data
     Promise.all([
@@ -48,7 +47,7 @@
             }      
      }
 
-      //colour scheme
+    //colour scheme
       var legendLabels = ["<2500 ", "2500 - 7500", "7501-12000", "12001-15000", "15001-20000", "20001 and more"]
       var colorScale = d3.scaleThreshold()
         .domain([1000, 5000, 10000, 15000, 25000, 30000])
@@ -105,7 +104,7 @@
 
     //legend
         var legendSize = 15;                                
-        var legendSpacing = 3; 
+        var legendSpacing = 2; 
                 
                 var legend = svg.selectAll('.legend')
                         .data(colorScale.domain())
